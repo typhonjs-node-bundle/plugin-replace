@@ -55,6 +55,16 @@ module.exports = async function(opts)
 /**
  * Adds flags for various built in commands like `build`.
  *
+ * To add handling of the *.env environment variables a double processing stage occurs in fvttdev build command. The
+ * flags are processed to pull out the --env flag then if present `dotenv` is used to load the given *.env file.
+ * We take advantage of the `default` definition for the `replace` flag below by providing a function that checks the
+ * associated environment variable `DEPLOY_REPLACE`. If it is present then it is treated as a JSON array and any
+ * parsing errors will halt execution of the CLI w/ the parse error shown to the user.
+ *
+ * A verification function is provided for FlagHandler which ensures that each entry is formatted as <xxx>=<yyy>
+ * splitting the left and right hand values formatting the output into one unified object. Errors will be thrown if
+ * the formatting is incorrect or if subsequent entries overwrite existing entries.
+ *
  * @param {string} command - ID of the command being run.
  */
 function s_ADD_FLAGS(command)
@@ -70,8 +80,100 @@ function s_ADD_FLAGS(command)
                replace: flags.string({
                   'char': 'r',
                   'description': 'Replace constants with hard-coded values.',
-                  'multiple': true
+                  'multiple': true,
+                  'default': function()
+                  {
+                     if (typeof process.env.DEPLOY_REPLACE === 'string')
+                     {
+                        let result = void 0;
+
+                        // Treat it as a JSON array.
+                        try { result = JSON.parse(process.env.DEPLOY_REPLACE); }
+                        catch (error)
+                        {
+                           const parseError = new Error(
+                            `Could not parse 'DEPLOY_REPLACE' as a JSON array;\n${error.message}`);
+
+                           // Set magic boolean for global CLI error handler to skip treating this as a fatal error.
+                           parseError.$$bundler_fatal = false;
+
+                           throw parseError;
+                        }
+
+                        if (!Array.isArray(result))
+                        {
+                           const parseError = new Error(`Please format 'DEPLOY_REPLACE' as a JSON array.`);
+
+                           // Set magic boolean for global CLI error handler to skip treating this as a fatal error.
+                           parseError.$$bundler_fatal = false;
+
+                           throw parseError;
+                        }
+
+                        return result;
+                     }
+
+                     return void 0;
+                  }
                })
+            },
+            verify: function(flags)
+            {
+               const regex = /(.+)=(.+)/;
+
+               // replace should always be an array
+               if (Array.isArray(flags.replace))
+               {
+                  const badEntries = [];
+                  const warnEntries = [];
+
+                  const entries = {};
+
+                  flags.replace.forEach((entry) =>
+                  {
+                     const matches = regex.exec(entry);
+
+                     if (matches !== null && matches.length >= 3)
+                     {
+                        // If the left hand match is already in the entries object as a key then add the current
+                        // entry to the warn list.
+                        if (matches[1] in entries)
+                        {
+                           warnEntries.push(entry);
+                        }
+                        else
+                        {
+                           entries[matches[1]] = matches[2];
+                        }
+                     }
+                     else
+                     {
+                        badEntries.push(entry);
+                     }
+                  });
+
+                  flags.replace = entries;
+
+                  if (badEntries.length > 0)
+                  {
+                     const error = new Error(`plugin-replace verify; can not parse ${JSON.stringify(badEntries)} each `
+                      + `entry must be in the format of <xxx>=<yyy>.`);
+
+                     error.$$bundler_fatal = false;
+
+                     throw error;
+                  }
+
+                  if (warnEntries.length > 0)
+                  {
+                     const error = new Error(`plugin-replace verify; the following entries overwrite previous entries `
+                      + `${JSON.stringify(warnEntries)}.`);
+
+                     error.$$bundler_fatal = false;
+
+                     throw error;
+                  }
+               }
             }
          });
          break;
