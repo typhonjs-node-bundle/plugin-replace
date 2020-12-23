@@ -69,7 +69,7 @@ function s_ADD_FLAGS(command)
             flags: {
                replace: flags.string({
                   'char': 'r',
-                  'description': 'Replace constants with hard-coded values',
+                  'description': 'Replace constants with hard-coded values.',
                   'multiple': true
                })
             }
