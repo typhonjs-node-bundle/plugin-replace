@@ -38,7 +38,7 @@ module.exports = async function(opts)
 {
    try
    {
-      process.pluginManager.add({ name: 'plugin-replace', instance: PluginHandler });
+      global.$$pluginManager.add({ name: 'plugin-replace', instance: PluginHandler });
 
       // Adds flags for various built in commands like `build`.
       s_ADD_FLAGS(opts.id);
@@ -65,6 +65,9 @@ module.exports = async function(opts)
  * splitting the left and right hand values formatting the output into one unified object. Errors will be thrown if
  * the formatting is incorrect or if subsequent entries overwrite existing entries.
  *
+ * Added flags include:
+ * `--replace`   - `-r` - Replace constants with hard-coded values.  - default:           - env: DEPLOY_REPLACE
+ *
  * @param {string} command - ID of the command being run.
  */
 function s_ADD_FLAGS(command)
@@ -73,7 +76,7 @@ function s_ADD_FLAGS(command)
    {
       // Add all built in flags for the build command.
       case 'build':
-         process.eventbus.trigger('oclif:system:flaghandler:add', {
+         global.$$eventbus.trigger('typhonjs:oclif:system:flaghandler:add', {
             command,
             plugin: 'plugin-replace',
             flags: {
@@ -100,6 +103,7 @@ function s_ADD_FLAGS(command)
                            throw parseError;
                         }
 
+                        // Verify that the JSON result loaded is an actual array otherwise quit with and error...
                         if (!Array.isArray(result))
                         {
                            const parseError = new Error(`Please format 'DEPLOY_REPLACE' as a JSON array.`);
@@ -110,6 +114,8 @@ function s_ADD_FLAGS(command)
                            throw parseError;
                         }
 
+                        // TODO: consider adding verification that the loaded array from JSON contains all strings.
+
                         return result;
                      }
 
@@ -117,6 +123,15 @@ function s_ADD_FLAGS(command)
                   }
                })
             },
+
+            /**
+             * Verifies the `replace` flag and checks that the data loaded is an array, and then attempts to parse each
+             * entry. If an entry is not a string in the format of <xxx>=<yyy> an error is generated. An error is also
+             * generated if an entry overwrites a previous entry which occurs when there are multiple left hand values
+             * of the same string.
+             *
+             * @param {object}   flags - The CLI flags to verify.
+             */
             verify: function(flags)
             {
                const regex = /(.+)=(.+)/;
@@ -154,21 +169,25 @@ function s_ADD_FLAGS(command)
 
                   flags.replace = entries;
 
+                  let errorMessage = 'plugin-replace verification failure:\n';
+
                   if (badEntries.length > 0)
                   {
-                     const error = new Error(`plugin-replace verify; can not parse ${JSON.stringify(badEntries)} each `
-                      + `entry must be in the format of <xxx>=<yyy>.`);
-
-                     error.$$bundler_fatal = false;
-
-                     throw error;
+                     errorMessage += `- can not parse ${JSON.stringify(badEntries)} each `
+                      + `entry must be a 'string' in the format of '<xxx>=<yyy>'.`;
                   }
 
                   if (warnEntries.length > 0)
                   {
-                     const error = new Error(`plugin-replace verify; the following entries overwrite previous entries `
-                      + `${JSON.stringify(warnEntries)}.`);
+                     errorMessage += `${badEntries.length > 0 ? '\n' : ''}- the following `
+                     + `entries overwrite previous entries ${JSON.stringify(warnEntries)}.`;
+                  }
 
+                  if (errorMessage !== 'plugin-replace verification failure:\n')
+                  {
+                     const error = new Error(errorMessage);
+
+                     // Set magic boolean for global CLI error handler to skip treating this as a fatal error.
                      error.$$bundler_fatal = false;
 
                      throw error;
