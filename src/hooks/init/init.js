@@ -1,5 +1,7 @@
 const { flags }   = require('@oclif/command');
 
+const replace     = require('@rollup/plugin-replace');
+
 /**
  * Handles interfacing with the plugin manager adding event bindings to pass back a configured
  * instance of `@rollup/plugin-replace`.
@@ -7,9 +9,20 @@ const { flags }   = require('@oclif/command');
 class PluginHandler
 {
    /**
-    * @returns {string}
+    * Returns the configured input plugin for `@rollup/plugin-replace`
+    *
+    * @param {object} config        - The CLI config
+    * @param {object} config.flags  - The CLI config
+    *
+    * @returns {object} Rollup plugin
     */
-   static test() { return 'some testing'; }
+   static getInputPlugin(config = {})
+   {
+      if (config.flags && typeof config.flags.replace === 'object')
+      {
+         return replace(config.flags.replace);
+      }
+   }
 
    /**
     * Wires up PluginHandler on the plugin eventbus.
@@ -22,8 +35,7 @@ class PluginHandler
     */
    static onPluginLoad(ev)
    {
-      // TODO: ADD EVENT REGISTRATION
-      // eventbus.on(`${eventPrepend}test`, PluginHandler.test, PluginHandler);
+      ev.eventbus.on('typhonjs:oclif:rollup:plugins:input:get', PluginHandler.getInputPlugin, PluginHandler);
    }
 }
 
@@ -38,7 +50,7 @@ module.exports = async function(opts)
 {
    try
    {
-      global.$$pluginManager.add({ name: 'plugin-replace', instance: PluginHandler });
+      global.$$pluginManager.add({ name: '@typhonjs-node-bundle/plugin-replace', instance: PluginHandler });
 
       // Adds flags for various built in commands like `build`.
       s_ADD_FLAGS(opts.id);
