@@ -11,16 +11,16 @@ class PluginHandler
    /**
     * Returns the configured input plugin for `@rollup/plugin-replace`
     *
-    * @param {object} config        - The CLI config
-    * @param {object} config.flags  - The CLI config
+    * @param {object} bundleData        - The CLI config
+    * @param {object} bundleData.cliFlags  - The CLI config
     *
     * @returns {object} Rollup plugin
     */
-   static getInputPlugin(config = {})
+   static getInputPlugin(bundleData = {})
    {
-      if (config.flags && typeof config.flags.replace === 'object')
+      if (bundleData.cliFlags && typeof bundleData.cliFlags.replace === 'object')
       {
-         return replace(config.flags.replace);
+         return replace(bundleData.cliFlags.replace);
       }
    }
 
