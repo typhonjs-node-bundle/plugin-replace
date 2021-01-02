@@ -35,7 +35,7 @@ class PluginHandler
     */
    static onPluginLoad(ev)
    {
-      ev.eventbus.on('typhonjs:oclif:rollup:plugins:main:input:get', PluginHandler.getInputPlugin, PluginHandler);
+      ev.eventbus.on('typhonjs:oclif:bundle:plugins:main:input:get', PluginHandler.getInputPlugin, PluginHandler);
    }
 }
 
@@ -50,7 +50,7 @@ module.exports = async function(opts)
 {
    try
    {
-      global.$$pluginManager.add({ name: '@typhonjs-node-bundle/plugin-replace', instance: PluginHandler });
+      global.$$pluginManager.add({ name: '@typhonjs-node-rollup/plugin-replace', instance: PluginHandler });
 
       // Adds flags for various built in commands like `build`.
       s_ADD_FLAGS(opts.id);
