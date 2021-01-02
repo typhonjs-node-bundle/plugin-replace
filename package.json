@@ -1,9 +1,9 @@
 {
-  "name": "plugin-replace",
+  "name": "@typhonjs-node-rollup/plugin-replace",
   "description": "Provides an Oclif plugin to to configure @rollup/plugin-replace for rollup-runner.",
   "version": "0.0.0",
   "author": "typhonrt",
-  "bugs": "https://github.com/typhonjs-node-bundle/npmbundle/issues",
+  "bugs": "https://github.com/typhonjs-node-rollup/issues/issues",
   "dependencies": {
     "@oclif/command": "^1.8.0",
     "@rollup/plugin-replace": "^2.0.0"
@@ -30,7 +30,7 @@
     "/oclif.manifest.json",
     "/src"
   ],
-  "homepage": "https://github.com/typhonjs-node-bundle/plugin-replace",
+  "homepage": "https://github.com/typhonjs-node-rollup/plugin-replace",
   "keywords": [
     "oclif-plugin"
   ],
@@ -42,7 +42,7 @@
       ]
     }
   },
-  "repository": "typhonjs-node-bundle/plugin-replace",
+  "repository": "typhonjs-node-rollup/plugin-replace",
   "scripts": {
     "eslint": "eslint .",
     "postpack": "rm -f oclif.manifest.json",
