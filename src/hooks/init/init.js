@@ -1,6 +1,8 @@
-const { flags }   = require('@oclif/command');
+const { flags }         = require('@oclif/command');
 
-const replace     = require('@rollup/plugin-replace');
+const replace           = require('@rollup/plugin-replace');
+
+const { NonFatalError } = require('@typhonjs-node-bundle/oclif-commons');
 
 /**
  * Handles interfacing with the plugin manager adding event bindings to pass back a configured
@@ -106,24 +108,14 @@ function s_ADD_FLAGS(command)
                         try { result = JSON.parse(process.env.DEPLOY_REPLACE); }
                         catch (error)
                         {
-                           const parseError = new Error(
+                           throw new NonFatalError(
                             `Could not parse 'DEPLOY_REPLACE' as a JSON array;\n${error.message}`);
-
-                           // Set magic boolean for global CLI error handler to skip treating this as a fatal error.
-                           parseError.$$bundler_fatal = false;
-
-                           throw parseError;
                         }
 
                         // Verify that the JSON result loaded is an actual array otherwise quit with and error...
                         if (!Array.isArray(result))
                         {
-                           const parseError = new Error(`Please format 'DEPLOY_REPLACE' as a JSON array.`);
-
-                           // Set magic boolean for global CLI error handler to skip treating this as a fatal error.
-                           parseError.$$bundler_fatal = false;
-
-                           throw parseError;
+                           throw new NonFatalError(`Please format 'DEPLOY_REPLACE' as a JSON array.`);
                         }
 
                         // TODO: consider adding verification that the loaded array from JSON contains all strings.
@@ -197,12 +189,7 @@ function s_ADD_FLAGS(command)
 
                   if (errorMessage !== 'plugin-replace verification failure:\n')
                   {
-                     const error = new Error(errorMessage);
-
-                     // Set magic boolean for global CLI error handler to skip treating this as a fatal error.
-                     error.$$bundler_fatal = false;
-
-                     throw error;
+                     throw new NonFatalError(errorMessage);
                   }
                }
             }
