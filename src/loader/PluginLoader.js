@@ -30,7 +30,7 @@ class PluginLoader
     * To add handling of the *.env environment variables a double processing stage occurs in fvttdev build command. The
     * flags are processed to pull out the --env flag then if present `dotenv` is used to load the given *.env file.
     * We take advantage of the `default` definition for the `replace` flag below by providing a function that checks the
-    * associated environment variable `DEPLOY_REPLACE`. If it is present then it is treated as a JSON array and any
+    * associated environment variable `{prefix}_REPLACE`. If it is present then it is treated as a JSON array and any
     * parsing errors will halt execution of the CLI w/ the parse error shown to the user.
     *
     * A verification function is provided for FlagHandler which ensures that each entry is formatted as <xxx>=<yyy>
@@ -38,7 +38,7 @@ class PluginLoader
     * the formatting is incorrect or if subsequent entries overwrite existing entries.
     *
     * Added flags include:
-    * `--replace`   - `-r` - Replace constants with hard-coded values.  - default:           - env: DEPLOY_REPLACE
+    * `--replace`   - `-r` - Replace constants with hard-coded values.  - default:           - env: {prefix}_REPLACE
     *
     * @param {string} command - ID of the command being run.
     * @param {object} eventbus - The eventbus to add flags to.
@@ -51,7 +51,7 @@ class PluginLoader
          case 'bundle':
             eventbus.trigger('typhonjs:oclif:system:flaghandler:add', {
                command,
-               plugin: 'plugin-replace',
+               plugin: PluginLoader.pluginName,
                flags: {
                   replace: flags.string({
                      'char': 'r',
@@ -90,10 +90,10 @@ class PluginLoader
                },
 
                /**
-                * Verifies the `replace` flag and checks that the data loaded is an array, and then attempts to parse each
-                * entry. If an entry is not a string in the format of <xxx>=<yyy> an error is generated. An error is also
-                * generated if an entry overwrites a previous entry which occurs when there are multiple left hand values
-                * of the same string.
+                * Verifies the `replace` flag and checks that the data loaded is an array, and then attempts to parse
+                * each entry. If an entry is not a string in the format of <xxx>=<yyy> an error is generated. An error
+                * is also generated if an entry overwrites a previous entry which occurs when there are multiple left
+                * hand values of the same string.
                 *
                 * @param {object}   flags - The CLI flags to verify.
                 */
