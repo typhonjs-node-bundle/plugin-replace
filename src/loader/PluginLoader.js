@@ -170,7 +170,7 @@ class PluginLoader
    {
       if (bundleData.cliFlags && typeof bundleData.cliFlags.replace === 'object')
       {
-         return replace(bundleData.cliFlags.replace);
+         return replace(Object.assign(bundleData.cliFlags.replace, { preventAssignment: true }));
       }
    }
 
