@@ -40,8 +40,8 @@
   "license": "MPL-2.0",
   "oclif": {
     "hooks": {
-      "init": [
-        "./src/hooks/init/init"
+      "bundle:load:plugins": [
+        "./src/hooks/bundle-load-plugins"
       ]
     }
   },
