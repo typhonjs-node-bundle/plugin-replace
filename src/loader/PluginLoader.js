@@ -1,8 +1,8 @@
-const { flags }         = require('@oclif/command');
+import { flags }           from '@oclif/command';
 
-const replace           = require('@rollup/plugin-replace');
+import replace             from '@rollup/plugin-replace';
 
-const { NonFatalError } = require('@typhonjs-node-bundle/oclif-commons');
+import { NonFatalError }   from '@typhonjs-node-bundle/oclif-commons';
 
 const s_CONFLICT_PACKAGES = ['@rollup/plugin-replace'];
 const s_PACKAGE_NAME = '@typhonjs-node-rollup/plugin-replace';
@@ -11,7 +11,7 @@ const s_PACKAGE_NAME = '@typhonjs-node-rollup/plugin-replace';
  * Handles interfacing with the plugin manager adding event bindings to pass back a configured
  * instance of `@rollup/plugin-replace`.
  */
-class PluginLoader
+export default class PluginLoader
 {
    /**
     * Returns the any modules that cause a conflict.
@@ -190,5 +190,3 @@ class PluginLoader
       PluginLoader.addFlags(ev.eventbus);
    }
 }
-
-module.exports = PluginLoader;
