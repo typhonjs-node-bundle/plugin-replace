@@ -55,16 +55,16 @@ export default class PluginLoader
                'char': 'r',
                'description': 'Replace constants with hard-coded values.',
                'multiple': true,
-               'default': function()
+               'default': function(envVars = process.env)
                {
                   const envVar = `${global.$$flag_env_prefix}_REPLACE`;
 
-                  if (typeof process.env[envVar] === 'string')
+                  if (typeof envVars[envVar] === 'string')
                   {
                      let result = void 0;
 
                      // Treat it as a JSON array.
-                     try { result = JSON.parse(process.env[envVar]); }
+                     try { result = JSON.parse(envVars[envVar]); }
                      catch (error)
                      {
                         throw new NonFatalError(
