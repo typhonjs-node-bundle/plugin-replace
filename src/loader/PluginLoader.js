@@ -1,5 +1,3 @@
-import { flags }           from '@oclif/command';
-
 import replace             from '@rollup/plugin-replace';
 
 import { NonFatalError }   from '@typhonjs-node-bundle/oclif-commons';
@@ -44,8 +42,10 @@ export default class PluginLoader
     * `--replace`   - `-r` - Replace constants with hard-coded values.  - default:           - env: {prefix}_REPLACE
     *
     * @param {object} eventbus - The eventbus to add flags to.
+    *
+    * @param {object} flags - The Oclif flags generator.
     */
-   static addFlags(eventbus)
+   static addFlags(eventbus, flags)
    {
       eventbus.trigger('typhonjs:oclif:system:flaghandler:add', {
          command: 'bundle',
@@ -187,6 +187,6 @@ export default class PluginLoader
    {
       ev.eventbus.on('typhonjs:oclif:bundle:plugins:main:input:get', PluginLoader.getInputPlugin, PluginLoader);
 
-      PluginLoader.addFlags(ev.eventbus);
+      PluginLoader.addFlags(ev.eventbus, ev.pluginOptions.flags);
    }
 }
