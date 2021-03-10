@@ -1,6 +1,6 @@
 import replace             from '@rollup/plugin-replace';
 
-import { NonFatalError }   from '@typhonjs-node-bundle/oclif-commons';
+import { NonFatalError }   from '@typhonjs-oclif/errors';
 
 const s_CONFLICT_PACKAGES = ['@rollup/plugin-replace'];
 const s_PACKAGE_NAME = '@typhonjs-node-rollup/plugin-replace';
