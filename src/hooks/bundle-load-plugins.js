@@ -11,8 +11,8 @@ export default async function(options)
 {
    try
    {
-      global.$$pluginManager.add({ name: PluginLoader.packageName, instance: PluginLoader,
-       options: { id: options.id, flags: options.flags } });
+      await global.$$pluginManager.addAsync({ name: PluginLoader.packageName, instance: PluginLoader,
+       options: { id: options.id, flagsModule: options.flagsModule } });
 
       global.$$eventbus.trigger('log:debug', `plugin-replace init hook running '${options.id}'.`);
    }

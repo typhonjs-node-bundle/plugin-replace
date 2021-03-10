@@ -55,8 +55,9 @@ export default class PluginLoader
                'char': 'r',
                'description': 'Replace constants with hard-coded values.',
                'multiple': true,
-               'default': function(envVars = process.env)
+               'default': function(context)
                {
+                  const envVars = context === null ? {} : process.env;
                   const envVar = `${global.$$flag_env_prefix}_REPLACE`;
 
                   if (typeof envVars[envVar] === 'string')
@@ -183,10 +184,12 @@ export default class PluginLoader
     *
     * @ignore
     */
-   static onPluginLoad(ev)
+   static async onPluginLoad(ev)
    {
       ev.eventbus.on('typhonjs:oclif:bundle:plugins:main:input:get', PluginLoader.getInputPlugin, PluginLoader);
 
-      PluginLoader.addFlags(ev.eventbus, ev.pluginOptions.flags);
+      const flags = await import(ev.pluginOptions.flagsModule);
+
+      PluginLoader.addFlags(ev.eventbus, flags);
    }
 }
