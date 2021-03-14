@@ -58,7 +58,7 @@ export default class PluginLoader
                'default': function(context)
                {
                   const envVars = context === null ? {} : process.env;
-                  const envVar = `${global.$$cli_env_prefix}_REPLACE`;
+                  const envVar = `${globalThis.$$cli_env_prefix}_REPLACE`;
 
                   if (typeof envVars[envVar] === 'string')
                   {
@@ -140,14 +140,14 @@ export default class PluginLoader
 
                if (badEntries.length > 0)
                {
-                  errorMessage += `- can not parse ${JSON.stringify(badEntries)} each `
-                   + `entry must be a 'string' in the format of '<xxx>=<yyy>'.`;
+                  errorMessage += `- can not parse ${JSON.stringify(badEntries)} each ` +
+                   `entry must be a 'string' in the format of '<xxx>=<yyy>'.`;
                }
 
                if (warnEntries.length > 0)
                {
-                  errorMessage += `${badEntries.length > 0 ? '\n' : ''}- the following `
-                   + `entries overwrite previous entries ${JSON.stringify(warnEntries)}.`;
+                  errorMessage += `${badEntries.length > 0 ? '\n' : ''}- the following ` +
+                   `entries overwrite previous entries ${JSON.stringify(warnEntries)}.`;
                }
 
                if (errorMessage !== 'plugin-replace verification failure:\n')
