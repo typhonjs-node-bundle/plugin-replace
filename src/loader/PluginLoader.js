@@ -14,14 +14,14 @@ export default class PluginLoader
    /**
     * Returns the any modules that cause a conflict.
     *
-    * @returns {string[]}
+    * @returns {string[]} An array of conflicting packages.
     */
    static get conflictPackages() { return s_CONFLICT_PACKAGES; }
 
    /**
     * Returns the `package.json` module name.
     *
-    * @returns {string}
+    * @returns {string} Package name.
     */
    static get packageName() { return s_PACKAGE_NAME; }
 
