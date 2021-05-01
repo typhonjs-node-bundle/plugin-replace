@@ -190,6 +190,6 @@ export default class PluginLoader
 
       const flags = await import(ev.pluginOptions.flagsModule);
 
-      PluginLoader.addFlags(ev.eventbus, flags);
+      PluginLoader.addFlags(ev.eventbus, flags.default);
    }
 }
